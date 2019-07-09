@@ -1,9 +1,17 @@
 
-
 const mongoConf     = require('./../config/mongoDB');
-const Coin          = require('./../models/coins');
+const Coin          = require('../models/Coins');
 
 module.exports = {
+    getAllCoins: async () => {
+
+        return new Promise( async (resolve, reject) => {
+            await Coin.getAllCoins( (err, result) => {
+                resolve(result);
+            });
+        })
+
+    },
     registerCoin: async (id, symbol, name) => {
         await Coin.getCoinById(id, async (err, result) => {
             if (!result) {
