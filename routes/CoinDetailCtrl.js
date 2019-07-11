@@ -2,6 +2,7 @@
 const mongoConf     = require('./../config/mongoDB');
 const Coin          = require('../models/Coins');
 const CoinDetail    = require('../models/CoinDetails');
+const CoinPairing   = require('../models/CoinPairing');
 
 
 module.exports = {
@@ -40,7 +41,37 @@ module.exports = {
             coinDetailInstance.circulating_supply = data.market_data.circulating_supply;
 
             coinDetailInstance.save().then( (result) => {
-                console.log('saved of ', result._id )
+                console.log('saved of ', result._id );
+
+
+                const coinPairingInstance = new CoinPairing();
+                const tradePairs = data.tickers;
+                const exchangesPairs = [];
+
+                for (let i =0; i<tradePairs.length; i++) {
+                    const pairTab = tradePairs[i];
+                    let pair = pairTab.target;
+                    let exchange = pairTab.market.name;
+                    let tradeUrl = pairTab.trade_url;
+                    let trust_score = pairTab.trust_score;
+                    exchangesPairs.push(
+                        {
+                            exchange : exchange,
+                            pair : pair,
+                            tradeUrl : tradeUrl,
+                            trust_score : trust_score,
+                        }
+                    );
+                }
+
+                coinPairingInstance._id = id;
+                coinPairingInstance.exchange = exchangesPairs;
+                coinPairingInstance.nbPairs = exchangesPairs.length;
+
+                coinPairingInstance.save().then( result => {
+                    console.log('saved of ', result._id, ' pair' );
+                } )
+
             });
 
         }
