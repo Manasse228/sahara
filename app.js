@@ -5,6 +5,7 @@ const cookieParser          = require('cookie-parser');
 const mongoConf             = require('./config/mongoDB');
 const CoinGecko             = require('coingecko-api');
 const CoinCtrl              = require('./routes/CoinCtrl');
+const ExchangeCtrl          = require('./routes/ExchangeCtrl');
 const CoinDetailCtrl        = require('./routes/CoinDetailCtrl');
 const CoinDetail            = require('./models/CoinDetails');
 const locks                 = require('locks');
@@ -14,6 +15,7 @@ const mutex         = locks.createMutex();
 const CoinGeckoClient = new CoinGecko();
 const app = express();
 
+// Save all coins on database
 const initiateCoinDB = async() => {
     const data = await CoinGeckoClient.ping();
     if (data.data) {
@@ -25,13 +27,7 @@ const initiateCoinDB = async() => {
     }
 };
 
-
-initiateCoinDB().then( async () => {
-    let coinList = await CoinGeckoClient.coins.list();
-    coinList = coinList.data;
-    CoinCtrl.setDeleteCoin(coinList);
-} );
-
+// Save coin details like name
 const fetchCoinDetail =  () => {
     CoinCtrl.getAllCoins().then( async (result) => {
         for (let i=0; i< result.length; i++) {
@@ -55,10 +51,27 @@ const fetchCoinDetail =  () => {
     })
 } ;
 
+// Save coin detail one by one
 const getCoinDetailsSlowly = async (id) => {
     let data = await CoinGeckoClient.coins.fetch(id);
     await CoinDetailCtrl.register(id, data.data);
 };
+
+// Save all exchanges
+const getAllExchanges = async () => {
+    let data = await CoinGeckoClient.exchanges.all();
+    for (let i=0; i<data.data.length; i++) {
+        await ExchangeCtrl.register(data.data[i]);
+    }
+};
+
+getAllExchanges().then();
+
+initiateCoinDB().then( async () => {
+    let coinList = await CoinGeckoClient.coins.list();
+    coinList = coinList.data;
+    CoinCtrl.setDeleteCoin(coinList);
+} );
 
 fetchCoinDetail();
 
