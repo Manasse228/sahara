@@ -10,20 +10,16 @@ const CoinDetailCtrl        = require('./routes/CoinDetailCtrl');
 const CoinDetail            = require('./models/CoinDetails');
 const locks                 = require('locks');
 
-
-const mutex         = locks.createMutex();
+const mutex   = locks.createMutex();
 const CoinGeckoClient = new CoinGecko();
 const app = express();
 
 // Save all coins on database
 const initiateCoinDB = async() => {
-    const data = await CoinGeckoClient.ping();
-    if (data.data) {
-        let coinList = await CoinGeckoClient.coins.list();
-        coinList = coinList.data;
-        for (let i=0; i< coinList.length; i++) {
-            await CoinCtrl.registerCoin(coinList[i].id, coinList[i].symbol, coinList[i].name);
-        }
+    let coinList = await CoinGeckoClient.coins.list();
+    coinList = coinList.data;
+    for (let i=0; i< coinList.length; i++) {
+        await CoinCtrl.registerCoin(coinList[i].id, coinList[i].symbol, coinList[i].name);
     }
 };
 
@@ -34,26 +30,22 @@ const fetchCoinDetail =  () => {
             await CoinDetail.getCoinDetailById(result[i]._id, async (err, _result) => {
                 if (!_result) {
                     try {
-
                         mutex.lock( async () => {
                             await getCoinDetailsSlowly(result[i]._id).then();
                             mutex.unlock();
                         });
-
                     } catch (e) {
                        console.log('error ', e)
                     }
-
                 }
             })
-
         }
     })
 } ;
 
 // Save coin detail one by one
 const getCoinDetailsSlowly = async (id) => {
-    let data = await CoinGeckoClient.coins.fetch(id);
+    let data = await CoinGeckoClient.coins.fetch(encodeURI(id));
     await CoinDetailCtrl.register(id, data.data);
 };
 
@@ -65,12 +57,12 @@ const getAllExchanges = async () => {
     }
 };
 
-getAllExchanges().then();
+//getAllExchanges().then();
 
 initiateCoinDB().then( async () => {
-    let coinList = await CoinGeckoClient.coins.list();
+    /*let coinList = await CoinGeckoClient.coins.list();
     coinList = coinList.data;
-    CoinCtrl.setDeleteCoin(coinList);
+    CoinCtrl.setDeleteCoin(coinList);*/
 } );
 
 fetchCoinDetail();

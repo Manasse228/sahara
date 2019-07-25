@@ -9,12 +9,16 @@ module.exports = {
 
     register: async (id, data) => {
 
-        if (data && id) {
+        if (data && !data.error && id) {
 
-            const fetch_homepage = data.links.homepage.filter( (el) => { return el !== ''; });
-            const fetch_blockchain_site = data.links.blockchain_site.filter( (el) => { return el !== ''; });
-            const fetch_github = data.links.repos_url.github.filter( (el) => { return el !== ''; });
-            const fetch_bitbucket = data.links.repos_url.bitbucket.filter( (el) => { return el !== ''; });
+            const fetch_homepage = (data.links && data.links.homepage) ?
+                data.links.homepage.filter( (el) => { return el !== ''; }) : "";
+            const fetch_blockchain_site = (data.links && data.links.blockchain_site) ?
+                data.links.blockchain_site.filter( (el) => { return el !== ''; }) : "";
+            const fetch_github = (data.links && data.links.repos_url.github) ?
+                data.links.repos_url.github.filter( (el) => { return el !== ''; }) : "";
+            const fetch_bitbucket = (data.links && data.links.repos_url.bitbucket) ?
+                data.links.repos_url.bitbucket.filter( (el) => { return el !== ''; }) : "";
 
             const coinDetailInstance = new CoinDetail();
 
@@ -43,7 +47,6 @@ module.exports = {
             coinDetailInstance.save().then( (result) => {
                 console.log('saved of ', result._id );
 
-
                 const coinPairingInstance = new CoinPairing();
                 const tradePairs = data.tickers;
                 const exchangesPairs = [];
@@ -70,12 +73,26 @@ module.exports = {
 
                 coinPairingInstance.save().then( result => {
                     console.log('saved of ', result._id, ' pair' );
+                    Coin.setDeadCoin(id, false,(err, result) => {
+                        //console.log('Coin ', id, ' is not dead!' );
+                    })
                 } )
 
             });
 
+        } else {
+            Coin.setDeadCoin(id, true,(err, result) => {
+                console.log('Coin ', id, ' is dead!' );
+            })
         }
 
+    },
+    setCoingecko_Add_Date: async (id) => {
+        await CoinDetail.getAllCoinDetails( async (err, result) => {
+            for (let i=0; i < result.length; i++) {
+                
+            }
+        });
     }
 
 };

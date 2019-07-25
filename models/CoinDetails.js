@@ -87,11 +87,20 @@ const CoinDetailSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    add_at: {
+        type: Date,
+        required: false
+    },
 
 });
 
 const CoinDetail = mongoose.model('CoinDetail', CoinDetailSchema);
 module.exports = CoinDetail;
+
+// Get all coindetails
+module.exports.getAllCoinDetails = (callback) => {
+    CoinDetail.find({}, callback);
+};
 
 // Get CoinDetail by id
 module.exports.getCoinDetailById = function(id, callback){
@@ -102,5 +111,12 @@ module.exports.getCoinDetailById = function(id, callback){
 module.exports.updateCoinDetailByPairing = (id, paringNumber, callback) => {
     const query = {_id: id};
     const newvalues = { $set: {paringNumber: paringNumber} };
+    CoinDetail.updateOne(query, newvalues, callback);
+};
+
+// Set CoinDetail add date
+module.exports.updateCoinDetailAddDate = (id, add_at, callback) => {
+    const query = {_id: id};
+    const newvalues = { $set: {add_at: add_at} };
     CoinDetail.updateOne(query, newvalues, callback);
 };

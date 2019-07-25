@@ -19,14 +19,14 @@ const CoinSchema = new mongoose.Schema({
         type: Date, default: Date.now,
         required: true
     },
-    delete: {
-        type: Boolean, default: false,
-        required: false
-    },
-    delete_at: {
+    dead_at: {
         type: Date,
         required: false
     },
+    coinDead : {
+        type: Boolean, default: false,
+        required: false
+    }
 });
 
 const Coin = mongoose.model('Coin', CoinSchema);
@@ -48,9 +48,9 @@ module.exports.getCoinBySymbol = function(symbol, callback){
     Coin.findOne(query, callback);
 };
 
-// Set deleted Coin
-module.exports.updateCoin = (id, callback) => {
+// Update dead Coin
+module.exports.setDeadCoin = (id, val, callback) => {
     const query = {_id: id};
-    const newvalues = { $set: {delete: true, delete_at: Date.now} };
+    const newvalues = { $set: {coinDead: val, dead_at: Date.now} };
     Coin.updateOne(query, newvalues, callback);
 };

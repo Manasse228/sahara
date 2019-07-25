@@ -26,19 +26,5 @@ module.exports = {
             }
         });
     },
-    setDeleteCoin: async (coinGeckoList) => {
-        await Coin.getAllCoins( async (err, result) => {
-            for (let i= 0; i<result.length; i++) {
-                let count = 0;
-                for (let j= 0; j<coinGeckoList.length; j++) {
-                    if (result[i]._id === coinGeckoList[j].id) {
-                        count++;
-                    }
-                }
-                if (count >0) {
-                    await Coin.updateCoin(result[i]._id);
-                }
-            }
-        } )
-    }
+
 };
