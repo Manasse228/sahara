@@ -3,6 +3,7 @@ const mongoConf     = require('./../config/mongoDB');
 const Coin          = require('../models/Coins');
 const CoinDetail    = require('../models/CoinDetails');
 const CoinPairing   = require('../models/CoinPairing');
+const axios         = require('axios');
 
 
 module.exports = {
@@ -87,10 +88,33 @@ module.exports = {
         }
 
     },
-    setCoingecko_Add_Date: async (id) => {
+    setCoingecko_Add_Date: async () => {
         await CoinDetail.getAllCoinDetails( async (err, result) => {
             for (let i=0; i < result.length; i++) {
-                
+                if (result[i].image && result[i].image.startsWith("https://assets.coingecko.com/coins/images/") && !result[i].add_at) {
+
+                    let break_img_link = result[i].image.split("https://assets.coingecko.com/coins/images/");
+                    let img_number = break_img_link[1].split("/");
+                    img_number = Number(img_number[0]);
+
+                    await axios.get('https://www.coingecko.com/price_charts/'+img_number+'/usd/max.json')
+                        .then(async response => {
+
+                            if (!response.data.error) {
+                                let _date = Number(response.data.stats[0][0]);
+                                _date = new Date(_date * 1000);
+                                await CoinDetail.updateCoinDetailAddDate(result[i]._id, _date, img_number, (err, _result) => {
+                                    console.log("Coin ",result[i]._id, " ", _date);
+                                })
+                            }
+
+                        })
+                        .catch(error => {
+                            //console.log(error);
+                        });
+
+
+                }
             }
         });
     }

@@ -40,6 +40,7 @@ const fetchCoinDetail =  () => {
                 }
             })
         }
+        CoinDetailCtrl.setCoingecko_Add_Date().then();
     })
 } ;
 
@@ -66,6 +67,7 @@ initiateCoinDB().then( async () => {
 } );
 
 fetchCoinDetail();
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

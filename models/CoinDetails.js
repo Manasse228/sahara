@@ -91,6 +91,10 @@ const CoinDetailSchema = new mongoose.Schema({
         type: Date,
         required: false
     },
+    add_at_timestamp: {
+        type: Number,
+        required: false
+    },
 
 });
 
@@ -115,8 +119,8 @@ module.exports.updateCoinDetailByPairing = (id, paringNumber, callback) => {
 };
 
 // Set CoinDetail add date
-module.exports.updateCoinDetailAddDate = (id, add_at, callback) => {
+module.exports.updateCoinDetailAddDate = (id, add_at, add_at_timestamp, callback) => {
     const query = {_id: id};
-    const newvalues = { $set: {add_at: add_at} };
+    const newvalues = { $set: {add_at: add_at, add_at_timestamp: add_at_timestamp} };
     CoinDetail.updateOne(query, newvalues, callback);
 };
