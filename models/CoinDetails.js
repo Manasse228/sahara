@@ -92,7 +92,7 @@ const CoinDetailSchema = new mongoose.Schema({
         required: false
     },
     add_at_timestamp: {
-        type: Number,
+        type: String,
         required: false
     },
 

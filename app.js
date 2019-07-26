@@ -64,9 +64,8 @@ initiateCoinDB().then( async () => {
     /*let coinList = await CoinGeckoClient.coins.list();
     coinList = coinList.data;
     CoinCtrl.setDeleteCoin(coinList);*/
+    fetchCoinDetail();
 } );
-
-fetchCoinDetail();
 
 
 app.use(express.json());

@@ -45,12 +45,12 @@ module.exports = {
             coinDetailInstance.total_supply = data.market_data.total_supply;
             coinDetailInstance.circulating_supply = data.market_data.circulating_supply;
 
-            coinDetailInstance.save().then( (result) => {
+            coinDetailInstance.save().then( async (result) => {
                 console.log('saved of ', result._id );
 
                 const coinPairingInstance = new CoinPairing();
                 const tradePairs = data.tickers;
-                const exchangesPairs = [];
+                /*const exchangesPairs = [];
 
                 for (let i =0; i<tradePairs.length; i++) {
                     const pairTab = tradePairs[i];
@@ -66,7 +66,9 @@ module.exports = {
                             trust_score : trust_score,
                         }
                     );
-                }
+                }*/
+
+                const exchangesPairs = await module.exports.getExchangeAndPair(tradePairs);
 
                 coinPairingInstance._id = id;
                 coinPairingInstance.exchange = exchangesPairs;
@@ -88,6 +90,25 @@ module.exports = {
         }
 
     },
+    getExchangeAndPair: async (tradePairs) => {
+        const exchangesPairs = [];
+        for (let i =0; i<tradePairs.length; i++) {
+            const pairTab = tradePairs[i];
+            let pair = pairTab.target;
+            let exchange = pairTab.market.name;
+            let tradeUrl = pairTab.trade_url;
+            let trust_score = pairTab.trust_score;
+            exchangesPairs.push(
+                {
+                    exchange : exchange,
+                    pair : pair,
+                    tradeUrl : tradeUrl,
+                    trust_score : trust_score,
+                }
+            );
+        }
+        return exchangesPairs;
+    },
     setCoingecko_Add_Date: async () => {
         await CoinDetail.getAllCoinDetails( async (err, result) => {
             for (let i=0; i < result.length; i++) {
@@ -103,8 +124,8 @@ module.exports = {
                             if (!response.data.error) {
                                 let _date = Number(response.data.stats[0][0]);
                                 _date = new Date(_date * 1000);
-                                await CoinDetail.updateCoinDetailAddDate(result[i]._id, _date, img_number, (err, _result) => {
-                                    console.log("Coin ",result[i]._id, " ", _date);
+                                await CoinDetail.updateCoinDetailAddDate(result[i]._id, _date, response.data.stats[0][0], (err, _result) => {
+                                    console.log("Coin ",result[i]._id, " ", _date, response.data.stats[0][0]);
                                 })
                             }
 
