@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 //Set up default mongoose connection
-const mongoDB = 'mongodb://192.168.1.82:27017/sahara';
+const mongoDB = 'mongodb://localhost/sahara';
 mongoose.connect(mongoDB, { useNewUrlParser: true });
 
 //Get the default connection

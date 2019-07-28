@@ -4,7 +4,11 @@ const Coin          = require('../models/Coins');
 const CoinDetail    = require('../models/CoinDetails');
 const CoinPairing   = require('../models/CoinPairing');
 const axios         = require('axios');
+const CoinGecko     = require('coingecko-api');
+const locks                 = require('locks');
 
+const CoinGeckoClient = new CoinGecko();
+const mutex   = locks.createMutex();
 
 module.exports = {
 
@@ -50,23 +54,6 @@ module.exports = {
 
                 const coinPairingInstance = new CoinPairing();
                 const tradePairs = data.tickers;
-                /*const exchangesPairs = [];
-
-                for (let i =0; i<tradePairs.length; i++) {
-                    const pairTab = tradePairs[i];
-                    let pair = pairTab.target;
-                    let exchange = pairTab.market.name;
-                    let tradeUrl = pairTab.trade_url;
-                    let trust_score = pairTab.trust_score;
-                    exchangesPairs.push(
-                        {
-                            exchange : exchange,
-                            pair : pair,
-                            tradeUrl : tradeUrl,
-                            trust_score : trust_score,
-                        }
-                    );
-                }*/
 
                 const exchangesPairs = await module.exports.getExchangeAndPair(tradePairs);
 
@@ -134,10 +121,25 @@ module.exports = {
                             //console.log(error);
                         });
 
-
                 }
             }
         });
+    },
+    updatePairNumber: async () => {
+        CoinDetail.getAllCoinDetails( (err, coinDetails) => {
+            coinDetails.forEach( async coinDetail => {
+                mutex.lock( async () => {
+                    let data = await CoinGeckoClient.coins.fetch(encodeURI(coinDetail._id));
+                    if (data.data.tickers) {
+                        data = await module.exports.getExchangeAndPair(data.data.tickers);
+                        await CoinPairing.updateCoinPairing(coinDetail._id, data, data.length, (err, result) => {
+                            console.log('Update Coin Pair ', coinDetail._id);
+                        });
+                    }
+                    mutex.unlock();
+                });
+            });
+        } )
     }
 
 };
