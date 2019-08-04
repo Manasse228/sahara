@@ -16,7 +16,8 @@
     "locks": "^0.2.2",
     "mongodb": "^3.2.7",
     "mongoose": "^5.6.3",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "sleep": "^6.1.0"
   },
   "devDependencies": {
     "nodemon": "^1.19.1"
