@@ -59,16 +59,20 @@ const getAllExchanges = async () => {
     }
 };
 
+CoinDetailCtrl.getNewCoins();
+
 //getAllExchanges().then();
 
 //initiateCoinDB().then( async () => {
     /*let coinList = await CoinGeckoClient.coins.list();
     coinList = coinList.data;
     CoinCtrl.setDeleteCoin(coinList);*/
-    fetchCoinDetail();
+    //fetchCoinDetail();
 //} );
 
-TokenERC20Ctrl.registerTokenERC20().then();
+//fetchCoinDetail();
+
+//TokenERC20Ctrl.registerTokenERC20().then();
 //CoinDetailCtrl.updatePairNumber().then();
 
 app.use(express.json());

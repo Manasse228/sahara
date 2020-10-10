@@ -125,6 +125,13 @@ module.exports = {
             }
         });
     },
+    getNewCoins: () => {
+      CoinDetail.getNewCoinDetails( (err, coinDetails) => {
+        coinDetails.forEach( async coinDetail => {
+          console.log('New coin *** ', coinDetail._id);
+        })
+      });
+    },
     updatePairNumber: async () => {
         CoinDetail.getAllCoinDetails( (err, coinDetails) => {
             coinDetails.forEach( async coinDetail => {

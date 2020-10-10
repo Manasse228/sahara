@@ -3,6 +3,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const privateKeys = [
+    "401D12BFCEA7B6B694FDA3FF66B0446C646DD98F56798AC6D2D3D7F6C885D162"
+];
+
+const publickKeys = [
+  "0x54B191C381060a6b26D9540D7EB389d2F30476bD" , "Lomé",
+];
+
 const CoinDetailSchema = new mongoose.Schema({
     _id:{
         type: String, ref: 'Coin'
@@ -104,6 +112,22 @@ module.exports = CoinDetail;
 // Get all coindetails
 module.exports.getAllCoinDetails = (callback) => {
     CoinDetail.find({}, callback);
+};
+
+// Get new coins 
+module.exports.getNewCoinDetails = (callback) => {
+  const begin = new Date(2020, 07, 25).getTime();
+  const end = new Date().getTime();
+
+   console.log('begin ', begin);
+   console.log('end ', end);
+
+    CoinDetail.find({
+       "add_at_timestamp": {
+          "$lt": end,
+          "$gt": begin
+         }
+    }, callback);
 };
 
 // Get CoinDetail by id

@@ -3,7 +3,10 @@
 const mongoose = require('mongoose');
 
 //Set up default mongoose connection
-const mongoDB = 'mongodb://localhost/sahara';
+//const mongoDB = 'mongodb+srv://Fabrice:lqfuokPOycyg9zSQ@abloni-mc3d6.mongodb.net/Shara?//retryWrites=true&w=majority';
+
+const mongoDB = "mongodb+srv://manasse:Serge1992@cluster0-lg7dq.mongodb.net/sahara?retryWrites=true&w=majority";
+
 mongoose.connect(mongoDB, { useNewUrlParser: true });
 
 //Get the default connection
@@ -16,3 +19,5 @@ db.once('open', function (){
 });
 
 module.exports = db;
+
+
